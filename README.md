@@ -9,33 +9,45 @@ A small Django application for a ride-hailing assignment. It includes a Django R
 - Django REST Framework
 - SQLite
 
+## Features
+
+- User registration
+- Driver registration
+- Driver location updates
+- Nearby driver matching
+- Ride booking and completion
+- Sedan and Hatchback support
+- Free Hatchback → Sedan upgrade
+- Fare calculation with minimum fare
+- Coupon support
+- User and driver ride history
+- Automated tests
+- Simple web frontend
+
 ## Setup
 
-From the project folder, activate the existing virtual environment in PowerShell:
+From the project folder, create and activate a fresh virtual environment in PowerShell, install the project dependencies, apply the database migrations, and start the development server:
 
 ```powershell
+python -m venv venv
 .\venv\Scripts\Activate.ps1
-```
-
-If dependencies are not installed in the environment, install them:
-
-```powershell
-python -m pip install "Django>=5.2,<5.3" djangorestframework
-```
-
-Create the database tables and start Django:
-
-```powershell
-python manage.py makemigrations rides
+pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
+```
+
+The requirements.txt file contains these dependencies:
+
+```text
+Django>=5.2,<5.3
+djangorestframework>=3.18,<3.19
 ```
 
 Open `http://127.0.0.1:8000/` for the frontend. The API is available at `http://127.0.0.1:8000/api/`.
 
 ## Frontend
 
-The homepage is a single Django template at `rides/templates/index.html`. It uses browser `fetch()` requests to call the API; no separate frontend server or npm installation is needed. Start Django with `python manage.py runserver`, then open `http://127.0.0.1:8000/`.
+The frontend is a Django template using HTML, CSS and vanilla JavaScript with `fetch()`. No React, npm or separate frontend server is required. Start Django with `python manage.py runserver`, then open `http://127.0.0.1:8000/`.
 
 ## API endpoints
 
@@ -131,4 +143,4 @@ Run the automated tests with:
 python manage.py test rides
 ```
 
-The tests cover user and driver registration, location updates, fare calculations, coupon discounts, nearby matching, no-driver responses, free upgrades, ride completion, and ride history.
+The automated tests cover registration, location updates, pricing, minimum fare, car types, coupons, nearby driver matching, free Hatchback to Sedan upgrade, ride completion and ride history.
