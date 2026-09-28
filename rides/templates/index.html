@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ride Hailing Application</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { margin: 0; padding: 28px 16px; background: #f3f5f8; color: #202938; font-family: Arial, sans-serif; }
+        main { max-width: 1100px; margin: 0 auto; }
+        h1 { margin: 0 0 8px; text-align: center; }
+        .intro { margin: 0 0 24px; color: #637083; text-align: center; }
+        .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 16px; }
+        section { padding: 18px; background: #fff; border: 1px solid #dce2e9; border-radius: 8px; }
+        h2 { margin: 0 0 15px; font-size: 19px; }
+        label { display: block; margin: 10px 0 5px; font-size: 14px; font-weight: bold; }
+        input, select { width: 100%; padding: 9px; border: 1px solid #bbc5d1; border-radius: 5px; background: #fff; font: inherit; }
+        button { margin-top: 14px; padding: 10px 14px; border: 0; border-radius: 5px; background: #1769aa; color: white; font: inherit; cursor: pointer; }
+        button:hover { background: #10558c; }
+        .message { min-height: 18px; margin: 12px 0 0; color: #26445f; font-size: 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
+        .upgrade { color: #167448; font-weight: bold; }
+        .fare { color: #1769aa; font-size: 24px; font-weight: bold; }
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; margin-top: 12px; border-collapse: collapse; font-size: 13px; }
+        th, td { padding: 8px; border: 1px solid #dce2e9; text-align: left; white-space: nowrap; }
+        th { background: #f3f5f8; }
+        @media (max-width: 520px) { body { padding: 20px 10px; } section { padding: 14px; } }
+    </style>
+</head>
+<body>
+<main>
+    <h1>Ride Hailing Application</h1>
+    <p class="intro">Simple frontend for the ride-hailing API</p>
+
+    <div class="cards">
+        <section>
+            <h2>1. Register User</h2>
+            <form id="user-form">
+                <label for="user-name">Name</label><input id="user-name" required>
+                <label for="user-email">Email</label><input id="user-email" type="email" required>
+                <label for="user-phone">Phone</label><input id="user-phone" required>
+                <button type="submit">Register User</button>
+            </form>
+            <p class="message" id="user-message" aria-live="polite"></p>
+        </section>
+
+        <section>
+            <h2>2. Register Driver</h2>
+            <form id="driver-form">
+                <label for="driver-name">Name</label><input id="driver-name" required>
+                <label for="driver-phone">Phone</label><input id="driver-phone" required>
+                <label for="driver-car-type">Car Type</label>
+                <select id="driver-car-type"><option>SEDAN</option><option>HATCHBACK</option></select>
+                <label for="driver-latitude">Latitude</label><input id="driver-latitude" type="number" step="any" required>
+                <label for="driver-longitude">Longitude</label><input id="driver-longitude" type="number" step="any" required>
+                <button type="submit">Register Driver</button>
+            </form>
+            <p class="message" id="driver-message" aria-live="polite"></p>
+        </section>
+
+        <section>
+            <h2>3. Update Driver Location</h2>
+            <form id="location-form">
+                <label for="location-driver-id">Driver ID</label><input id="location-driver-id" type="number" min="1" required>
+                <label for="location-latitude">Latitude</label><input id="location-latitude" type="number" step="any" required>
+                <label for="location-longitude">Longitude</label><input id="location-longitude" type="number" step="any" required>
+                <button type="submit">Update Location</button>
+            </form>
+            <p class="message" id="location-message" aria-live="polite"></p>
+        </section>
+
+        <section>
+            <h2>4. Book Ride</h2>
+            <form id="book-form">
+                <label for="booking-user-id">User ID</label><input id="booking-user-id" type="number" min="1" required>
+                <label for="pickup-latitude">Pickup Latitude</label><input id="pickup-latitude" type="number" step="any" required>
+                <label for="pickup-longitude">Pickup Longitude</label><input id="pickup-longitude" type="number" step="any" required>
+                <label for="booking-car-type">Car Type</label>
+                <select id="booking-car-type"><option>SEDAN</option><option>HATCHBACK</option></select>
+                <label for="booking-radius">Radius (km)</label><input id="booking-radius" type="number" step="any" min="0" value="5" required>
+                <label for="booking-coupon">Coupon Code (optional)</label><input id="booking-coupon">
+                <button type="submit">Book Ride</button>
+            </form>
+            <div class="message" id="book-message" aria-live="polite"></div>
+        </section>
+
+        <section>
+            <h2>5. End Ride</h2>
+            <form id="end-form">
+                <label for="end-ride-id">Ride ID</label><input id="end-ride-id" type="number" min="1" required>
+                <label for="drop-latitude">Drop Latitude</label><input id="drop-latitude" type="number" step="any" required>
+                <label for="drop-longitude">Drop Longitude</label><input id="drop-longitude" type="number" step="any" required>
+                <button type="submit">End Ride</button>
+            </form>
+            <p id="end-fare" class="fare" aria-live="polite"></p>
+            <div class="message" id="end-message" aria-live="polite"></div>
+        </section>
+
+        <section>
+            <h2>6. Create Coupon</h2>
+            <form id="coupon-form">
+                <label for="coupon-code">Coupon Code</label><input id="coupon-code" required>
+                <label for="coupon-discount">Discount Percent</label><input id="coupon-discount" type="number" step="any" required>
+                <button type="submit">Create Coupon</button>
+            </form>
+            <p class="message" id="coupon-message" aria-live="polite"></p>
+        </section>
+
+        <section>
+            <h2>7. User Ride History</h2>
+            <form id="user-history-form">
+                <label for="history-user-id">User ID</label><input id="history-user-id" type="number" min="1" required>
+                <button type="submit">Get User History</button>
+            </form>
+            <div class="table-wrap" id="user-history"></div>
+            <p class="message" id="user-history-message" aria-live="polite"></p>
+        </section>
+
+        <section>
+            <h2>8. Driver Ride History</h2>
+            <form id="driver-history-form">
+                <label for="history-driver-id">Driver ID</label><input id="history-driver-id" type="number" min="1" required>
+                <button type="submit">Get Driver History</button>
+            </form>
+            <div class="table-wrap" id="driver-history"></div>
+            <p class="message" id="driver-history-message" aria-live="polite"></p>
+        </section>
+    </div>
+</main>
+
+<script>
+    const API_BASE = '/api';
+    let currentRideId = null;
+
+    function value(id) {
+        return document.getElementById(id).value.trim();
+    }
+
+    function showMessage(id, message) {
+        document.getElementById(id).textContent = message;
+    }
+
+    async function apiRequest(url, method, data) {
+        const options = { method: method, headers: {} };
+        if (data !== undefined) {
+            options.headers['Content-Type'] = 'application/json';
+            options.body = JSON.stringify(data);
+        }
+
+        const response = await fetch(url, options);
+        const text = await response.text();
+        let result = {};
+        if (text) {
+            try {
+                result = JSON.parse(text);
+            } catch (error) {
+                result = { detail: text };
+            }
+        }
+        if (!response.ok) {
+            throw new Error(typeof result === 'string' ? result : JSON.stringify(result));
+        }
+        return result;
+    }
+
+    function showError(elementId, error) {
+        showMessage(elementId, 'Error: ' + error.message);
+    }
+
+    document.getElementById('user-form').addEventListener('submit', async function (event) {
+        event.preventDefault();
+        try {
+            const result = await apiRequest(API_BASE + '/users/', 'POST', {
+                name: value('user-name'), email: value('user-email'), phone: value('user-phone')
+            });
+            showMessage('user-message', 'User registered successfully. User ID: ' + result.id);
+        } catch (error) { showError('user-message', error); }
+    });
+
+    document.getElementById('driver-form').addEventListener('submit', async function (event) {
+        event.preventDefault();
+        try {
+            const result = await apiRequest(API_BASE + '/drivers/', 'POST', {
+                name: value('driver-name'), phone: value('driver-phone'), car_type: value('driver-car-type'),
+                latitude: Number(value('driver-latitude')), longitude: Number(value('driver-longitude'))
+            });
+            showMessage('driver-message', 'Driver registered successfully. Driver ID: ' + result.id);
+        } catch (error) { showError('driver-message', error); }
+    });
+
+    document.getElementById('location-form').addEventListener('submit', async function (event) {
+        event.preventDefault();
+        try {
+            const result = await apiRequest(API_BASE + '/drivers/' + value('location-driver-id') + '/location/', 'PUT', {
+                latitude: Number(value('location-latitude')), longitude: Number(value('location-longitude'))
+            });
+            showMessage('location-message', JSON.stringify(result, null, 2));
+        } catch (error) { showError('location-message', error); }
+    });
+
+    document.getElementById('book-form').addEventListener('submit', async function (event) {
+        event.preventDefault();
+        try {
+            const result = await apiRequest(API_BASE + '/rides/book/', 'POST', {
+                user_id: Number(value('booking-user-id')),
+                pickup_latitude: Number(value('pickup-latitude')),
+                pickup_longitude: Number(value('pickup-longitude')),
+                car_type: value('booking-car-type'),
+                radius: Number(value('booking-radius')),
+                coupon_code: value('booking-coupon')
+            });
+            currentRideId = result.id;
+            document.getElementById('end-ride-id').value = currentRideId;
+            let message = 'Ride ID: ' + result.id + '\nDriver ID: ' + result.driver
+                + '\nRequested Car Type: ' + result.requested_car_type
+                + '\nActual Car Type: ' + result.actual_car_type
+                + '\nStatus: ' + result.status;
+            if (result.requested_car_type === 'HATCHBACK' && result.actual_car_type === 'SEDAN') {
+                message += '\nFREE UPGRADE: Sedan assigned';
+            }
+            showMessage('book-message', message);
+        } catch (error) { showError('book-message', error); }
+    });
+
+    document.getElementById('end-form').addEventListener('submit', async function (event) {
+        event.preventDefault();
+        try {
+            const result = await apiRequest(API_BASE + '/rides/' + value('end-ride-id') + '/end/', 'POST', {
+                drop_latitude: Number(value('drop-latitude')),
+                drop_longitude: Number(value('drop-longitude'))
+            });
+            document.getElementById('end-fare').textContent = 'Fare: ₹' + result.fare;
+            showMessage('end-message', 'Distance: ' + result.distance + ' km'
+                + '\nStatus: ' + result.status + '\nRequested Car Type: ' + result.requested_car_type
+                + '\nActual Car Type: ' + result.actual_car_type);
+        } catch (error) {
+            document.getElementById('end-fare').textContent = '';
+            showError('end-message', error);
+        }
+    });
+
+    document.getElementById('coupon-form').addEventListener('submit', async function (event) {
+        event.preventDefault();
+        try {
+            const result = await apiRequest(API_BASE + '/coupons/', 'POST', {
+                code: value('coupon-code'), discount_percent: Number(value('coupon-discount'))
+            });
+            showMessage('coupon-message', 'Coupon created successfully. Coupon ID: ' + result.id);
+        } catch (error) { showError('coupon-message', error); }
+    });
+
+    function escapeHtml(text) {
+        return String(text ?? '').replace(/[&<>"']/g, function (character) {
+            return {'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[character];
+        });
+    }
+
+    function displayHistory(containerId, rides, personField) {
+        const container = document.getElementById(containerId);
+        if (!rides.length) {
+            container.innerHTML = '<p>No rides found.</p>';
+            return;
+        }
+        const headers = ['Ride ID', personField === 'driver' ? 'Driver' : 'User', 'Requested Car', 'Actual Car', 'Distance', 'Fare', 'Status'];
+        let html = '<table><thead><tr>' + headers.map(function (header) {
+            return '<th>' + header + '</th>';
+        }).join('') + '</tr></thead><tbody>';
+        rides.forEach(function (ride) {
+            html += '<tr><td>' + escapeHtml(ride.id) + '</td><td>' + escapeHtml(ride[personField])
+                + '</td><td>' + escapeHtml(ride.requested_car_type) + '</td><td>' + escapeHtml(ride.actual_car_type)
+                + '</td><td>' + escapeHtml(ride.distance) + '</td><td>₹' + escapeHtml(ride.fare)
+                + '</td><td>' + escapeHtml(ride.status) + '</td></tr>';
+        });
+        container.innerHTML = html + '</tbody></table>';
+    }
+
+    document.getElementById('user-history-form').addEventListener('submit', async function (event) {
+        event.preventDefault();
+        try {
+            const rides = await apiRequest(API_BASE + '/users/' + value('history-user-id') + '/rides/', 'GET');
+            displayHistory('user-history', rides, 'driver');
+            showMessage('user-history-message', 'Ride history loaded.');
+        } catch (error) { showError('user-history-message', error); }
+    });
+
+    document.getElementById('driver-history-form').addEventListener('submit', async function (event) {
+        event.preventDefault();
+        try {
+            const rides = await apiRequest(API_BASE + '/drivers/' + value('history-driver-id') + '/rides/', 'GET');
+            displayHistory('driver-history', rides, 'user');
+            showMessage('driver-history-message', 'Ride history loaded.');
+        } catch (error) { showError('driver-history-message', error); }
+    });
+</script>
+</body>
+</html>
